@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="HandheldFriendly" content="True" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="generator" content="Hugo 0.83.1" />
+
+
+<link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/57803202?v=4" />
+
+
+
+<title>Automatyczna Instalacja Ubuntu Server - tomektom</title>
+
+
+<meta name="author" content="tomektom" />
+
+
+
+<meta name="keywords" content="ubuntu, linux" />
+
+
+<meta property="og:title" content="Automatyczna Instalacja Ubuntu Server" />
+<meta name="twitter:title" content="Automatyczna Instalacja Ubuntu Server" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomektom.github.io/post/automatyczna-instalacja-ubuntu-server/" /><meta property="og:description" content="Czasem może wystąpić potrzeba instalacji wielu maszyn z bardzo podobną konfiguracją. Z rozwiązaniami chmurowymi nie ma większego problemu – dostawcy często udostępniają odpowiednie narzędzia pozwalające w kilka chwil postawić taką maszynę – musimy tylko zapewnić konfigurację jakiej sobie życzymy. Podobnie z maszynami wirtualnymi – wystarczy modyfikacja pliku konfiguracyjnego albo odpowiednia komenda. Inaczej ma się sprawa z fizycznym sprzętem – tutaj trzeba zapewnić odpowiednio spreparowane ISO. Tutaj pokażę jak to zrobić na przykładzie Ubuntu Server 20.04." />
+<meta name="twitter:description" content="Czasem może wystąpić potrzeba instalacji wielu maszyn z bardzo podobną konfiguracją. Z rozwiązaniami chmurowymi nie ma większego problemu – dostawcy często udostępniają odpowiednie narzędzia pozwalające w kilka chwil postawić taką maszynę – musimy tylko zapewnić konfigurację jakiej sobie życzymy. Podobnie z maszynami wirtualnymi – wystarczy modyfikacja pliku konfiguracyjnego albo odpowiednia komenda. Inaczej ma się sprawa z fizycznym sprzętem – tutaj trzeba zapewnić odpowiednio spreparowane ISO. Tutaj pokażę jak to zrobić na przykładzie Ubuntu Server 20.04." /><meta property="og:image" content="https://tomektom.github.io/img/stworek.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://tomektom.github.io/img/stworek.png" /><meta property="article:published_time" content="2021-07-11T13:38:17+02:00" /><meta property="article:modified_time" content="2021-07-11T13:38:17+02:00" />
+
+
+<style>
+    @media (prefers-color-scheme: dark) {
+        body[data-theme='auto'] img {
+            filter: brightness(60%);
+        }
+    }
+
+    body[data-theme='dark'] img {
+        filter: brightness(60%);
+    }
+</style>
+
+
+
+
+<link rel="stylesheet" href="https://tomektom.github.io/assets/css/fuji.min.css" />
+
+
+
+
+
+
+
+
+</head>
+
+<body
+  data-theme="auto"
+  data-theme-auto='false'
+  >
+    <script data-cfasync="false">
+  
+  var fujiThemeData = localStorage.getItem('fuji_data-theme');
+  
+  if (!fujiThemeData) {
+    localStorage.setItem('fuji_data-theme', 'auto');
+  } else {
+    
+    if (fujiThemeData !== 'auto') {
+      document.body.setAttribute('data-theme', fujiThemeData === 'dark' ? 'dark' : 'light');
+    }
+  }
+</script>
+
+    <header>
+    <div class="container-lg clearfix">
+        <div class="col-12 header">
+            <a class="title-main" href="https://tomektom.github.io">tomektom</a>
+            
+            <span class="title-sub">Notatki z życia wzięte.</span>
+            
+        </div>
+    </div>
+</header>
+
+    <main>
+        <div class="container-lg clearfix">
+            
+            <div class="col-12 col-md-9 float-left content">
+                
+<article>
+    
+    <h2 class="post-item post-title">
+        <a href="https://tomektom.github.io/post/automatyczna-instalacja-ubuntu-server/">Automatyczna Instalacja Ubuntu Server</a>
+    </h2>
+    <div class="post-item post-meta">
+        <span><i class="iconfont icon-today-sharp"></i>&nbsp;2021-07-11</span>
+
+<span><i class="iconfont icon-file-tray-sharp"></i>&nbsp;497 słowa</span>
+<span><i class="iconfont icon-time-sharp"></i>&nbsp;3 minut</span>
+<span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href="/tags/ubuntu">ubuntu</a>&nbsp;<a href="/tags/linux">linux</a>&nbsp;</span>
+
+    </div>
+    
+    <div class="post-content markdown-body">
+        <p>Czasem może wystąpić potrzeba instalacji wielu maszyn z bardzo podobną konfiguracją. Z rozwiązaniami chmurowymi nie ma większego problemu – dostawcy często udostępniają odpowiednie narzędzia pozwalające w kilka chwil postawić taką maszynę – musimy tylko zapewnić konfigurację jakiej sobie życzymy. Podobnie z maszynami wirtualnymi – wystarczy modyfikacja pliku konfiguracyjnego albo odpowiednia komenda. Inaczej ma się sprawa z fizycznym sprzętem – tutaj trzeba zapewnić odpowiednio spreparowane ISO. Tutaj pokażę jak to zrobić na przykładzie Ubuntu Server 20.04.</p>
+<h2 id="potrzebne-narzędzia">Potrzebne narzędzia</h2>
+<p>Żeby zacząć musimy mieć z czym pracować, a więc pobieramy oficjalne iso Ubuntu Server ze strony <a href="https://ubuntu.com/download/server" target="_blank">Ubuntu</a>. Ponadto będziemy potrzebowali biblioteki <code>libisoburn</code>, która dostarczy program xorriso, który z kolei pozwoli utworzyć nasze iso oraz <code>syslinux</code>, który zapewni niezbędne bootloadery dla naszego iso.</p>
+<p>Poza tym potrzebna będzie konfiguracja naszego systemu, znajdująca się w pliku <code>user-data</code>. Jest tego sporo, w dodatku całkiem dobrze opisane i opatrzone przykładami w dokumentacji, więc po prostu do niej odeślę:</p>
+<ul>
+<li>dokumentacji Ubuntu nt. <a href="https://ubuntu.com/server/docs/install/autoinstall-reference" target="_blank">tworzenia konfiguracji</a></li>
+<li>dokumentacji ubuntowego instalatora <a href="https://curtin.readthedocs.io/en/latest/index.html" target="_blank">curtin</a></li>
+<li>dokumentacji <a href="https://cloudinit.readthedocs.io/en/latest/topics/modules.html" target="_blank">cloud-init</a> z którego Ubuntu w dużym stopniu korzysta, aczkolwiek należy mieć na uwadze, że nie wszystkie moduły będą działać</li>
+</ul>
+<p>W razie problemów – zwłaszcza z dyskami – warto także zajrzeć do pliku <code>/var/log/installer/curtin-install-cfg.yaml</code>, który tworzy się po instalacji Ubuntu Server. Zawiera on automatycznie wygenerowaną konfigurację z której korzystał curtin.</p>
+<h2 id="procedura">Procedura</h2>
+<p>Na samym początku trzeba utworzyć katalog w którym będziemy trzymać naszą konfigurację, a więc:</p>
+<pre><code class="language-bash">mkdir -p iso/nocloud/
+</code></pre>
+<p>Następnie trzeba rozpakować oficjalny obraz do świeżo utworzonego katalogu <code>iso</code>, można to zrobić na dwa sposoby. Polecam 7z, bo jest krótszy, drugi sposób załączam jako komentarz:</p>
+<pre><code class="language-bash">7z x ubuntu-20.04.2-live-server-amd64.iso -x'![BOOT]' -oiso
+#xorriso -osirrox on -indev &quot;ubuntu-20.04.2-live-server-amd64.iso&quot; -extract / iso &amp;&amp; chmod -R +w iso
+</code></pre>
+<p>Dopisujemy odpowiednie flagi do plików odpowiedzialnych za zabootowanie naszego iso, a więc:</p>
+<pre><code class="language-bash">sed -i 's|---|autoinstall ds=nocloud\\\;s=/cdrom/nocloud/ ---|g' iso/boot/grub/grub.cfg
+sed -i 's|---|autoinstall ds=nocloud;s=/cdrom/nocloud/ ---|g' iso/isolinux/txt.cfg
+</code></pre>
+<p>Wyłączamy obowiązkowe sprawdzanie md5, jeśli tego nie zrobimy instalator odmówi nam zabootowania iso.</p>
+<pre><code class="language-bash">md5sum iso/.disk/info &gt; iso/md5sum.txt
+sed -i 's|iso/|./|g' iso/md5sum.txt
+</code></pre>
+<p>Teraz trzeba utworzyć da niezbędne pliki, których wymaga automatyczny instalator Ubuntu. Powinny się one znajdować w katalogu <code>iso/nocloud</code>, przy czym drugi z nich to jest nasza konfiguracja, którą wcześniej utworzyliśmy.</p>
+<pre><code class="language-bash">touch iso/nocloud/meta-data
+cp user-data iso/nocloud/user-data
+</code></pre>
+<p>No i w końcu tworzymy iso. W zależności od tego na jakim systemie pracujecie komenda będzie się różnić, na Archu i pochodnych wygląda następująco:</p>
+<pre><code class="language-bash">xorriso -as mkisofs -r \
+  -V Ubuntu\ custom\ amd64 \
+  -o ubuntu-20.04.2-live-server-amd64-autoinstall.iso \
+  -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
+  -boot-load-size 4 -boot-info-table \
+  -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
+  -isohybrid-gpt-basdat -isohybrid-apm-hfsplus \
+  -isohybrid-mbr /usr/lib/syslinux/bios/isohdpfx.bin  \
+  iso/boot iso
+</code></pre>
+<p>natomiast na Debianie, Ubuntu i pokrewnych w konsolę wklepujemy takie coś:</p>
+<pre><code class="language-bash">xorriso -as mkisofs -r \
+  -V Ubuntu\ custom\ amd64 \
+  -o ubuntu-20.04.2-live-server-amd64-autoinstall.iso \
+  -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot \
+  -boot-load-size 4 -boot-info-table \
+  -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot \
+  -isohybrid-gpt-basdat -isohybrid-apm-hfsplus \
+  -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin  \
+  iso/boot iso
+</code></pre>
+<p>I to wszystko, mamy gotowe iso. Warto tutaj zaznaczyć, że gdyby coś w naszym configu się nie podobało i chcielibyśmy coś zmienić nie trzeba powtarzać całej procedury. Wystarczy, że zmodyfikujemy <code>iso/nocloud/user-data</code> i powtórzymy ostatni krok.</p>
+    </div>
+</article>
+
+
+<div class="license markdown-body">
+    <blockquote>
+        <p>O ile nie zaznaczono inaczej, zawartość tej witryny jest objęta licencją <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+               target="_blank">CC BY-NC-SA 4.0</a>.</p>
+    </blockquote>
+</div>
+
+
+
+            </div>
+            <aside class="col-12 col-md-3 float-left sidebar">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>Strony</h3>
+        <ul>
+            
+            <li>
+                <a href="/">Home</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">Archiwum</a>
+            </li>
+            
+            <li>
+                <a href="/about/">O mnie</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Szukaj</a>
+            </li>
+            
+            <li>
+                <a href="/index.xml">RSS</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>Linki</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/tomektom" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://forum.manjaro.pl/" target="_blank"><span>Forum Manjaro PL</span></a>
+            </li>
+            
+            <li>
+                <a href="https://forum.manjaro.org/u/tomek/summary" target="_blank"><span>Oficjalne Forum Manjaro</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>Tagi</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/linux/">linux</a>
+            </span>
+            
+            <span>
+                <a href="/tags/ubuntu/">ubuntu</a>
+            </span>
+            
+        </div>
+    </div>
+    <div class="sidebar-item sidebar-toc">
+        <h3>Spis Treści</h3><nav id="TableOfContents">
+  <ul>
+    <li><a href="#potrzebne-narzędzia">Potrzebne narzędzia</a></li>
+    <li><a href="#procedura">Procedura</a></li>
+  </ul>
+</nav></div>
+</aside>
+
+        </div>
+        <div class="btn">
+    <div class="btn-menu" id="btn-menu">
+        <i class="iconfont icon-grid-sharp"></i>
+    </div>
+    <div class="btn-toggle-mode">
+        <i class="iconfont icon-contrast-sharp"></i>
+    </div>
+    <div class="btn-scroll-top">
+        <i class="iconfont icon-chevron-up-circle-sharp"></i>
+    </div>
+</div>
+<aside class="sidebar-mobile" style="display: none;">
+  <div class="sidebar-wrapper">
+    
+    <div class="sidebar-item sidebar-pages">
+        <h3>Strony</h3>
+        <ul>
+            
+            <li>
+                <a href="/">Home</a>
+            </li>
+            
+            <li>
+                <a href="/archives/">Archiwum</a>
+            </li>
+            
+            <li>
+                <a href="/about/">O mnie</a>
+            </li>
+            
+            <li>
+                <a href="/search/">Szukaj</a>
+            </li>
+            
+            <li>
+                <a href="/index.xml">RSS</a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-links">
+        <h3>Linki</h3>
+        <ul>
+            
+            <li>
+                <a href="https://github.com/tomektom" target="_blank"><span>GitHub</span></a>
+            </li>
+            
+            <li>
+                <a href="https://forum.manjaro.pl/" target="_blank"><span>Forum Manjaro PL</span></a>
+            </li>
+            
+            <li>
+                <a href="https://forum.manjaro.org/u/tomek/summary" target="_blank"><span>Oficjalne Forum Manjaro</span></a>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <div class="sidebar-item sidebar-tags">
+        <h3>Tagi</h3>
+        <div>
+            
+            <span>
+                <a href="/tags/linux/">linux</a>
+            </span>
+            
+            <span>
+                <a href="/tags/ubuntu/">ubuntu</a>
+            </span>
+            
+        </div>
+    </div>
+    
+    
+    
+    <div class="sidebar-item sidebar-toc">
+        <h3>Spis Treści</h3>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#potrzebne-narzędzia">Potrzebne narzędzia</a></li>
+    <li><a href="#procedura">Procedura</a></li>
+  </ul>
+</nav>
+    </div>
+    
+    
+  </div>
+</aside>
+    </main>
+
+    <footer>
+    <div class="container-lg clearfix">
+        <div class="col-12 footer">
+            
+            <p>
+                O ile nie zaznaczono inaczej, zawartość tej witryny jest objęta licencją <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a>.
+            </p>
+            
+            <span>&copy; 2021-2021
+                <a href="https://tomektom.github.io">tomektom</a>
+                 | <a href="https://github.com/tomektom/blog">Source code</a> 
+                | Wspierane Przez <a href="https://github.com/dsrkafuu/hugo-theme-fuji/"
+                   target="_blank">Fuji-v2</a> &amp; <a href="https://gohugo.io/"
+                                                    target="_blank">Hugo</a> 
+            </span>
+        </div>
+    </div>
+</footer>
+
+    
+<script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+
+
+<script defer src="/assets/js/fuji.min.js"></script>
+
+
+
+</body>
+
+</html>

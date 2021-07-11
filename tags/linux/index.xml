@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linux on tomektom</title>
+    <link>https://tomektom.github.io/tags/linux/</link>
+    <description>Recent content in linux on tomektom</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pl</language>
+    <lastBuildDate>Sun, 11 Jul 2021 13:38:17 +0200</lastBuildDate><atom:link href="https://tomektom.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Automatyczna Instalacja Ubuntu Server</title>
+      <link>https://tomektom.github.io/post/automatyczna-instalacja-ubuntu-server/</link>
+      <pubDate>Sun, 11 Jul 2021 13:38:17 +0200</pubDate>
+      
+      <guid>https://tomektom.github.io/post/automatyczna-instalacja-ubuntu-server/</guid>
+      <description>&lt;p&gt;Czasem może wystąpić potrzeba instalacji wielu maszyn z bardzo podobną konfiguracją. Z rozwiązaniami chmurowymi nie ma większego problemu – dostawcy często udostępniają odpowiednie narzędzia pozwalające w kilka chwil postawić taką maszynę – musimy tylko zapewnić konfigurację jakiej sobie życzymy. Podobnie z maszynami wirtualnymi – wystarczy modyfikacja pliku konfiguracyjnego albo odpowiednia komenda. Inaczej ma się sprawa z fizycznym sprzętem – tutaj trzeba zapewnić odpowiednio spreparowane ISO. Tutaj pokażę jak to zrobić na przykładzie Ubuntu Server 20.04.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
